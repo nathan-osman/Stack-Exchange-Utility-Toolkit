@@ -24,7 +24,7 @@ function Editor(post_id) {
        directly to the toolbar. If not, schedules another attempt for later. */
     var clearButtonQueue = function() {
         
-        var left = toolbar.find('li:not(.wmd-help-button):last').css('left');
+        var left = toolbar.find('li.wmd-button:not(.wmd-help-button):last').css('left');
         if(left === null) {
             
             if(!button_timeout)
@@ -63,7 +63,11 @@ function Editor(post_id) {
         }
     };
     
-    /* Adds the provided buttons to the toolbar. */
+    /* Adds the provided buttons to the toolbar. This parameter is an array
+       of objects that contain the following properties:
+        - 'icon' the URL of the icon to display
+        - 'title' the title to display when hovered over
+        - 'callback' the function to execute when the button is clicked */
     this.addToolbarButtons = function(buttons) {
         
         button_queue.push(buttons);
@@ -76,22 +80,23 @@ function Editor(post_id) {
     this.selectedText = function(text) {
         
         /* Get the contents of the editor and current selection indices. */
-        var contents = editor.val();
-        var start    = editor[0].selectionStart;
-        var end      = editor[0].selectionEnd;
+        var textarea = editor.find('.wmd-input');
+        var contents = textarea.val();
+        var start    = textarea[0].selectionStart;
+        var end      = textarea[0].selectionEnd;
         
         /* If no parameter was supplied, simply return the current text. */
         if(typeof text == 'undefined')
-            return contents.substr(start, end);
+            return contents.substr(start, end - start);
         
         /* Set the new contents of the editor. */
         contents = contents.substr(0, start) + text + contents.substr(end);
-        editor.val(contents);
+        textarea.val(contents);
         
         /* Set the focus to the editor and highlight the newly inserted text. */
-        editor[0].focus();
-        editor[0].selectionStart = start;
-        editor[0].selectionEnd   = start + text.length;
+        textarea.focus();
+        textarea[0].selectionStart = start;
+        textarea[0].selectionEnd   = start + text.length;
         
         // TODO: this is rather innefficient as it refreshes ALL previews.
         
